@@ -16,6 +16,7 @@
     "crypto-js": "^4.1.1",
     "dotenv": "^16.0.0",
     "lz-string": "^1.4.4",
+    "mysql2": "^2.3.3",
     "qs": "^6.10.3",
     "tough-cookie": "^4.0.0",
     "tough-cookie-file-store": "^2.0.3"

@@ -20,6 +20,10 @@ const agent = new https.Agent({
 const client = wrapper(axios.create({
     jar, agent,
     baseURL: "https://pcare.bpjs-kesehatan.go.id/vaksin",
+    headers: {
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36',
+        'X-Forwarded-For': '234.23.112.12'
+    }
 
 }));
 const Pcare = {
@@ -33,7 +37,9 @@ const Pcare = {
                 })
             ).then(
                 ({ src, token }) => client.get(src.replace('&amp;', '&'), { responseType: 'stream' }).then(
-                    ({ data }) => new Promise((r, j) => {
+                    ({ data }) => new Promise(async (r, j) => {
+                        let instanceId = src.match(/;t=(.+)$/)[1]
+                        await client.get(`/BotDetectCaptcha.ashx?get=script-include&c=AppCaptcha&t=${instanceId}`)
                         console.log(src, token);
                         const tmp = join(tmpdir(), randomBytes(8).toString('hex') + '.jpg')
                         const handle = createWriteStream(tmp)
@@ -53,11 +59,7 @@ const Pcare = {
                                 captcha = val
                                 pid.kill()
                                 readline.close();
-                                r({
-                                    captcha,
-                                    token,
-                                    instanceId: src.match(/;t=(.+)$/)[1]
-                                })
+                                r({ captcha, token, instanceId })
                                 unlinkSync(tmp)
                             });
                         })
@@ -72,7 +74,7 @@ const Pcare = {
     },
     keepAliveCheck() {
         return client.get('keepAlive/check').then(res => {
-            console.log('keepAlive',res.status, res.headers['content-type'])
+            console.log('keepAlive', res.status, res.headers['content-type'])
             // process.exit(0)
             return res.status == 200 && typeof res.data == 'object'
         })
@@ -93,7 +95,6 @@ const Pcare = {
             do {
                 captcha = await this.resolveCaptcha()
             } while (!captcha)
-            console.log(captcha);
             const params = {
                 __RequestVerificationToken: captcha.token,
                 username: process.env.PCARE_USER,
@@ -102,24 +103,23 @@ const Pcare = {
                 captchaid: 'AppCaptcha',
                 instanceid: captcha.instanceId
             }
+            console.log('Resolved', qs.stringify(params));
             loggedIn = await client.post('Login/login', qs.stringify(params), {
                 headers: {
                     'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
                 }
             }).then(
-                ({ data }) => {
+                async ({ data, status }) => {
                     console.log(data)
-                    return data
+                    //await client.get(`/Home`)
+                    return status == 200
                 }
             )
         } while (!loggedIn || !await this.keepAliveCheck())
     },
     vaksinasi(nik) {
         return client.post('/Broker/ticket_nik', { data: encodeRequest({ nik }) })
-            .then(({ data }) => decodeResponse(data))
-            .catch( err => {
-                console.log('Eee', err.message);
-            })
+            .then(({ data }) => decodeResponse(data).data)
     }
 
 }
