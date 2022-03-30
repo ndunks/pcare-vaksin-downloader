@@ -1,3 +1,4 @@
+/** @type {import('axios').Axios} */
 const axios = require('axios');
 const { wrapper } = require('axios-cookiejar-support');
 const { CookieJar } = require('tough-cookie');
@@ -9,9 +10,10 @@ const { tmpdir } = require('os');
 const qs = require('qs');
 const { randomBytes } = require('crypto');
 const { encodeRequest, decodeResponse } = require('./lib');
+const { data } = require('../opensid');
 const CookieFileStore = require('tough-cookie-file-store').FileCookieStore
 process.env.NODE_OPTIONS = "--tls-cipher-list='ECDHE - RSA - AES128 - GCM - SHA256: !RC4'"
-const jar = new CookieJar(new CookieFileStore('.data/cookie.json'));
+const jar = new CookieJar(new CookieFileStore(process.env.DATA_DIR + '/cookie.json'));
 const agent = new https.Agent({
     rejectUnauthorized: false,
     checkServerIdentity: false,
@@ -39,7 +41,13 @@ const Pcare = {
                 ({ src, token }) => client.get(src.replace('&amp;', '&'), { responseType: 'stream' }).then(
                     ({ data }) => new Promise(async (r, j) => {
                         let instanceId = src.match(/;t=(.+)$/)[1]
-                        await client.get(`/BotDetectCaptcha.ashx?get=script-include&c=AppCaptcha&t=${instanceId}`)
+                        const remoteCaptcha = await client.get(`/BotDetectCaptcha.ashx?get=script-include&c=AppCaptcha&t=${instanceId}`).then(
+                            ({ data }) => data.match(/\/\/remote\.captcha\.com\/include\.js\?i=[^\']+/)[0]
+                        );
+                        console.log('remote', remoteCaptcha);
+                        await axios.get('https:' + remoteCaptcha, {
+                            jar
+                        }).then(({ data }) => console.log(data))
                         console.log(src, token);
                         const tmp = join(tmpdir(), randomBytes(8).toString('hex') + '.jpg')
                         const handle = createWriteStream(tmp)
@@ -120,6 +128,17 @@ const Pcare = {
     vaksinasi(nik) {
         return client.post('/Broker/ticket_nik', { data: encodeRequest({ nik }) })
             .then(({ data }) => decodeResponse(data).data)
+    },
+    riwayatVaksin(nik) {
+        const req = {
+            nokartu: nik,
+            identitas: 0,
+            poliVaksin: 2020,
+            tglVaksin: "2022-03-30",
+            vaccinationDate: ""
+        }
+        return client.post('/EntriPenerimaVaksinKLB/getRiwVaksinasiByNokartu', { dataRiw: encodeRequest(req) })
+            .then(({ data }) => decodeResponse(data).response?.data)
     }
 
 }

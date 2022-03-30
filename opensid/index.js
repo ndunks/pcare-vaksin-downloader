@@ -2,6 +2,8 @@
 const mysql = require('mysql2/promise');
 const fs = require('fs')
 let con;
+const OPENSID_DATA = process.env.DATA_DIR + '/opensid.json'
+
 const OpenSID = {
     data: {
         currentPage: 0,
@@ -17,7 +19,7 @@ const OpenSID = {
             database: process.env.MYSQL_DATABASE,
             password: process.env.MYSQL_PASSWORD
         });
-        if (fs.existsSync('.data/opensid.json')) {
+        if (fs.existsSync(OPENSID_DATA)) {
             this.load()
             console.log(this.data);
         } else {
@@ -34,10 +36,10 @@ const OpenSID = {
         }
     },
     load() {
-        this.data = JSON.parse(fs.readFileSync('.data/opensid.json', 'ascii'))
+        this.data = JSON.parse(fs.readFileSync(OPENSID_DATA, 'ascii'))
     },
     save() {
-        return fs.writeFileSync('.data/opensid.json', JSON.stringify(this.data, null, 2))
+        return fs.writeFileSync(OPENSID_DATA, JSON.stringify(this.data, null, 2))
     },
     next() {
         const offset = this.data.currentPage * this.data.perPage
@@ -66,8 +68,28 @@ const OpenSID = {
            `, [rows])
         return;
     },
+    async insertVaksinRiwayat(rows) {
+        const sql = await con.query(`INSERT INTO vaksin (
+            id_penduduk,
+            nik,
+            vaccineLast,
+            vaccineLastType,
+            vaccineLastTypeName,
+            vaccineLastDate,
+            vaccineLastLocation,
+            raw 
+            ) VALUES ? ON DUPLICATE KEY UPDATE
+            raw = VALUES(raw),
+            vaccineLast = VALUES(vaccineLast),
+            vaccineLastType = VALUES(vaccineLastType),
+            vaccineLastTypeName = VALUES(vaccineLastTypeName),
+            vaccineLastDate = VALUES(vaccineLastDate),
+            vaccineLastLocation = VALUES(vaccineLastLocation)
+           `, [rows])
+        return;
+    },
     checkHasVaccineId(nik) {
-        return con.query('SELECT 1 from vaksin WHERE nik = ? and not isnull(vaccineId)', [nik])
+        return con.query('SELECT 1 from vaksin WHERE nik = ? and not isnull(raw)', [nik])
             .then(
                 res => res[0].length
             )
