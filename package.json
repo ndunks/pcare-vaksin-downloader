@@ -1,0 +1,26 @@
+{
+  "name": "pcare-opensid",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "NODE_OPTIONS=--tls-cipher-list='ECDHE-RSA-AES128-GCM-SHA256' nodemon -e .js",
+    "start": "NODE_OPTIONS=--tls-cipher-list='ECDHE-RSA-AES128-GCM-SHA256' node index.js"
+  },
+  "author": "Mochamad Arifin",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.26.1",
+    "axios-cookiejar-support": "^2.0.4",
+    "crypto-js": "^4.1.1",
+    "dotenv": "^16.0.0",
+    "lz-string": "^1.4.4",
+    "qs": "^6.10.3",
+    "tough-cookie": "^4.0.0",
+    "tough-cookie-file-store": "^2.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}

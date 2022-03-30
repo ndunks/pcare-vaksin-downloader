@@ -1,0 +1,118 @@
+{
+  "success": true,
+  "code": 200,
+  "message": "Get detail vaccine Success",
+  "data": {
+    "vaccineId": "610b77d1c467d272c38a8be1",
+    "fullName": "MOCHAMAD ARIFIN",
+    "address": "DS. KLAMPOK RT 3/11, KEC. PWJ KLAMPOK ",
+    "nik": "3304021207910003",
+    "mobileNumber": "+6285726501017",
+    "mobileNumberPatient": "085726501017",
+    "addressNik": "",
+    "distrcitId": "",
+    "rt": "",
+    "rw": "",
+    "gender": "",
+    "locationArea": "",
+    "bornDate": "1991-07-12",
+    "age": 30,
+    "profession": "",
+    "channel": "pedulilindungi",
+    "vaccine": [
+      {
+        "vaccinationCode": "J-0000PIJ6",
+        "vaccinationDate": "2021-08-05",
+        "vaccinationTime": "08:00 - 15:00 WIB",
+        "certificateUrl": "https://dev-asset.pedulilindungi.id/assets/sertifikatvaksin1.png",
+        "originalUrl": "https://pedulilindungi.id/sertifikat/1/610b77d1c467d272c38a8be1",
+        "shortUrl": "https://pdl.id/c/19yu97i3",
+        "type": "first",
+        "vaccinated": {
+          "date": "2021-08-05T07:00:00+07:00",
+          "vaccineStatus": 2,
+          "vaccineStatusName": "TELAH VAKSIN",
+          "vaccineType": "P70251501COV",
+          "VaccineTypeName": "CoronaVac",
+          "vaccineBatch": "24203121",
+          "vaccineSerialNumber": "",
+          "vaccineReason": ""
+        },
+        "status": "vaccinated",
+        "hospital": {
+          "hospitalId": "5ffa5e06d98e77afdf9ae422",
+          "faskesCode": "01440003",
+          "name": "KLINIK POLRES BANJARNEGARA",
+          "address": "Semarang, Kec. Banjarnegara, Banjarnegara, Jawa Tengah 53411, Indonesia",
+          "lat": -7.3965872,
+          "long": 109.7007135,
+          "phone": "-",
+          "hostpitalImage": "https://asset2.pedulilindungi.id/hospital/default_hospital.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=bkH0t7roV2livE6A61Jo%2F20220330%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20220330T012011Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=941d2c6429e7228a79e91e80b0d5878b1d818c056dfdce7135a0ccfdad25c7e8",
+          "statusFaskes": false
+        },
+        "reschedule": false
+      },
+      {
+        "vaccinationCode": "K-000111DQ",
+        "vaccinationDate": "2021-09-02",
+        "vaccinationTime": "08:00 - 15:00 WIB",
+        "certificateUrl": "https://dev-asset.pedulilindungi.id/assets/sertifikatvaksin2.png",
+        "originalUrl": "https://pedulilindungi.id/sertifikat/2/610b77d1c467d272c38a8be1",
+        "shortUrl": "https://pdl.id/c/19yv0rvk",
+        "type": "second",
+        "vaccinated": {
+          "date": "2021-09-03T07:00:00+07:00",
+          "vaccineStatus": 2,
+          "vaccineStatusName": "TELAH VAKSIN",
+          "vaccineType": "01.019",
+          "VaccineTypeName": "CoronaVac",
+          "vaccineBatch": "24202121",
+          "vaccineSerialNumber": "",
+          "vaccineReason": ""
+        },
+        "status": "vaccinated",
+        "hospital": {
+          "hospitalId": "5ffa5e06d98e77afdf9ae422",
+          "faskesCode": "01440003",
+          "name": "KLINIK POLRES BANJARNEGARA",
+          "address": "Semarang, Kec. Banjarnegara, Banjarnegara, Jawa Tengah 53411, Indonesia",
+          "lat": -7.3965872,
+          "long": 109.7007135,
+          "phone": "-",
+          "hostpitalImage": "https://asset2.pedulilindungi.id/hospital/default_hospital.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=bkH0t7roV2livE6A61Jo%2F20220330%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20220330T012011Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=941d2c6429e7228a79e91e80b0d5878b1d818c056dfdce7135a0ccfdad25c7e8",
+          "statusFaskes": false
+        },
+        "reschedule": false
+      },
+      {
+        "vaccinationCode": "UU-00QPNTF",
+        "vaccinationDate": "2021-12-02",
+        "vaccinationTime": "08:00 - 15:00 WIB",
+        "certificateUrl": "",
+        "originalUrl": "",
+        "shortUrl": "",
+        "type": "third",
+        "vaccinated": null,
+        "status": "active",
+        "hospital": {
+          "hospitalId": "6021d1d1d98e77afdf1edf8f",
+          "faskesCode": "VAKSIN01",
+          "name": "SELURUH FASKES VAKSINASI COVID-19",
+          "address": "",
+          "lat": 0,
+          "long": 0,
+          "phone": "-",
+          "hostpitalImage": "https://asset2.pedulilindungi.id/hospital/default_hospital.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=bkH0t7roV2livE6A61Jo%2F20220330%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20220330T012011Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=941d2c6429e7228a79e91e80b0d5878b1d818c056dfdce7135a0ccfdad25c7e8",
+          "statusFaskes": false
+        },
+        "reschedule": false
+      }
+    ],
+    "claimed": false,
+    "cityId": "",
+    "cityName": "",
+    "professionCat": null,
+    "typeProgram": "vpp",
+    "vaccineExpired": ""
+  }
+}
