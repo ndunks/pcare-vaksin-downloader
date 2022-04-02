@@ -3,6 +3,7 @@ const fs = require('fs')
 if(!process.env.DATA_DIR){
     process.env.DATA_DIR = '.data'
 }
+const isUpdate = process.argv[process.argv.length - 1] == 'update'
 if (!fs.existsSync(process.env.DATA_DIR)) {
     fs.mkdirSync(process.env.DATA_DIR)
 }
@@ -95,13 +96,12 @@ const parseRowRiwayat = (opensid, items) => {
         .sort(
             (a, b) => b.vaksinKe - a.vaksinKe
         )[0] || {}
-        console.log(opensid.nik, vaccine);
     if (vaccine && vaccine.vaksinKe) {
-        row[2] = items.vaksinKe // vaccineLast
-        row[3] = vaccine.vaccinated?.kdVaksin // vaccineLastType
-        row[4] = vaccine.vaccinated?.nmVaksin // vaccineLastTypeName
-        row[5] = (vaccine.vaccinated?.fdate || '').split('-').reverse().join('-') // vaccineLastDate
-        row[6] = vaccine.hospital?.nmppk_pelayanan // vaccineLastLocation
+        row[2] = vaccine.vaksinKe // vaccineLast
+        row[3] = vaccine.kdVaksin // vaccineLastType
+        row[4] = vaccine.nmVaksin // vaccineLastTypeName
+        row[5] = (vaccine.tglVaksin || '').split('-').reverse().join('-') // vaccineLastDate
+        row[6] = vaccine.nmppk_pelayanan // vaccineLastLocation
     };
     return row
 }
@@ -132,8 +132,8 @@ OpenSID.connect()
                 const rows = []
                 for (let opensid of ids) {
                     let pcareData;
-                    const exists = await OpenSID.checkHasVaccineId(opensid.nik)
-                    if (!exists) {
+                    const exists = isUpdate ? false : await OpenSID.checkHasVaccineId(opensid.nik)
+                    if ( !exists) {
                         do {
                             error = null
                             try {
