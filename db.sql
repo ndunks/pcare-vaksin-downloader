@@ -1,17 +1,3 @@
--- vaksin_view
-SELECT 
-    p.nik, p.nama, p.tanggallahir,
-    c.dusun, c.rt, c.rw,
-    v.vaccineLast as vaksinKe,
-    v.vaccineLastTypeName as jenisVaksin,
-    v.vaccineLastDate as tglVaksin,
-    s.nama as status, k.no_kk
-    FROM vaksin v 
-    inner join tweb_penduduk p on p.id = v.id_penduduk
-    left join tweb_keluarga k on k.id = p.id_kk
-    left join tweb_wil_clusterdesa c on c.id = k.id_cluster
-    left join tweb_penduduk_status s on s.id = p.status
-    order by p.id_kk, p.nik
 --
 -- Struktur dari tabel `vaksin`
 --
@@ -51,3 +37,17 @@ ALTER TABLE `vaksin`
 ALTER TABLE `vaksin`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 SELECT
+
+
+-- vaksin_view
+SELECT 
+    p.nik, p.nama, p.tanggallahir,
+    c.dusun, c.rt, c.rw,
+    v.vaccineLast as vaksinKe,
+    v.vaccineLastTypeName as jenisVaksin,
+    v.vaccineLastDate as tglVaksin, k.no_kk
+    FROM vaksin v 
+    inner join tweb_penduduk p on p.id = v.id_penduduk
+    left join tweb_keluarga k on k.id = p.id_kk
+    left join tweb_wil_clusterdesa c on c.id = k.id_cluster
+    order by p.id_kk, p.nik
