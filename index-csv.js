@@ -2,8 +2,6 @@ require('dotenv').config()
 const fs = require('fs')
 const readline = require('readline');
 const { stringify: csvStringify } = require('csv-stringify');
-
-const { dirname, join } = require('path')
 const niksTxt = process.argv[process.argv.length - 1]
 if (!fs.existsSync(niksTxt)) {
     console.error('NIKs file not found')
@@ -50,29 +48,25 @@ async function countLine(fileTxt) {
 
 const parseRowRiwayat = (nik, items) => {
     const row = [
-        new Date().toUTCString(), // 0 date
-        nik, // 1 nik
-        null, // 2 vaccineLast
-        null, // 3 vaccineLastType
-        null, // 4 vaccineLastTypeName
-        null, // 5 vaccineLastDate
-        null, // 6 vaccineLastLocation
-        null, // 7 raw
+        nik, // 0 nik
+        null, // 1 vaccineLast
+        null, // 2 vaccineLastType
+        null, // 3 vaccineLastTypeName
+        null, // 4 vaccineLastDate
+        null, // 5 vaccineLastLocation
     ]
     if (!items || !Array.isArray(items)) return row
-    row[7] = JSON.stringify(items) // raw
-
     const vaccine = items
         .filter(v => v.status == 'TELAH VAKSIN')
         .sort(
             (a, b) => b.vaksinKe - a.vaksinKe
         )[0] || {}
     if (vaccine && vaccine.vaksinKe) {
-        row[2] = vaccine.vaksinKe // vaccineLast
-        row[3] = vaccine.kdVaksin // vaccineLastType
-        row[4] = vaccine.nmVaksin // vaccineLastTypeName
-        row[5] = (vaccine.tglVaksin || '').split('-').reverse().join('-') // vaccineLastDate
-        row[6] = vaccine.nmppk_pelayanan // vaccineLastLocation
+        row[1] = vaccine.vaksinKe // vaccineLast
+        row[2] = vaccine.kdVaksin // vaccineLastType
+        row[3] = vaccine.nmVaksin // vaccineLastTypeName
+        row[4] = (vaccine.tglVaksin || '').split('-').reverse().join('-') // vaccineLastDate
+        row[5] = vaccine.nmppk_pelayanan // vaccineLastLocation
     };
     return row
 }
@@ -95,7 +89,6 @@ PCare.login().then(
                 'vaccineLastTypeName',
                 'vaccineLastDate',
                 'vaccineLastLocation',
-                'raw',
             ]
         })
         csv.pipe(csvFile)
@@ -117,8 +110,10 @@ PCare.login().then(
                 clearTimeout(nextWatTimer);
                 nextWatTimer = 0
             }
-            csv.destroy()
-            fs.closeSync(csvFile)
+            try {
+                csv.destroy()
+                fs.closeSync(csvFile)
+            } catch (error) { }
         }
         process.on("SIGINT", clearing);
         process.once("SIGUSR2", clearing)
