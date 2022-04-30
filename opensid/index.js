@@ -11,7 +11,7 @@ const OpenSID = {
         totalCandidate: 0,
         perPage: 10,
     },
-    where: "not isnull(nik) and nik > 1000000000  and tanggallahir <= date('2016-03-01')",
+    where: "not isnull(nik) and nik > 1000000000  and tanggallahir <= date('2016-03-01') and status_dasar = 1",
     async connect() {
         con = await mysql.createConnection({
             host: process.env.MYSQL_HOST,

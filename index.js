@@ -13,19 +13,6 @@ const { decodeResponse } = require('./pcare/lib')
 
 let keepAliveTimer = 0
 let nextWatTimer = 0
-const typeSorts = {
-    first: 1,
-    second: 2,
-    third: 3,
-    fourth: 4,
-    fifth: 5,
-    sixth: 6,
-    seventh: 7,
-    eighth: 8,
-    nineth: 9,
-    tenth: 10,
-}
-
 
 async function keepAliveWatcher() {
     const loggedIn = await PCare.keepAliveCheck()
@@ -36,46 +23,6 @@ async function keepAliveWatcher() {
     }
 }
 
-const parseRow = (opensid, pcare) => {
-    const row = [
-        opensid.id, // 0 id_penduduk
-        opensid.nik, // 1 nik
-        null, // 2 vaccineId
-        null, // 3 fullName
-        null, // 4 mobileNumber
-        null, // 5 bornDate
-        null, // 6 age
-        null, // 7 raw
-        null, // 8 vaccineLast
-        null, // 9 vaccineLastType
-        null, // 10 vaccineLastTypeName
-        null, // 11 vaccineLastDate
-        null, // 12 vaccineLastLocation
-    ]
-    if (!pcare || !Array.isArray(pcare.vaccine)) return row
-
-    row[2] = pcare.vaccineId // vaccineId
-    row[3] = pcare.fullName // fullName
-    row[4] = pcare.mobileNumber // mobileNumber
-    row[5] = pcare.bornDate // bornDate
-    row[6] = pcare.age // age
-    row[7] = JSON.stringify(pcare) // raw
-
-    const vaccine = pcare.vaccine
-        .filter(v => v.status == 'vaccinated')
-        .sort(
-            (a, b) => typeSorts[b.type] - typeSorts[a.type]
-        )[0] || {}
-
-    if (vaccine && vaccine.type) {
-        row[8] = typeSorts[vaccine.type] // vaccineLast
-        row[9] = vaccine.vaccinated?.vaccineType // vaccineLastType
-        row[10] = vaccine.vaccinated?.VaccineTypeName // vaccineLastTypeName
-        row[11] = vaccine.vaccinated?.date // vaccineLastDate
-        row[12] = vaccine.hospital?.name // vaccineLastLocation
-    };
-    return row
-}
 const parseRowRiwayat = (opensid, items) => {
     const row = [
         opensid.id, // 0 id_penduduk
@@ -151,7 +98,7 @@ OpenSID.connect()
                                     error = err
                                     console.log('Sleeping.. zzZZZzz..');
                                     await new Promise(r => nextWatTimer = setTimeout(r, code == 429 ? 30000 : 5000))
-                                    Pcare.keepAliveCheck()
+                                    PCare.keepAliveCheck()
                                     nextWatTimer = 0
                                 } else {
                                     console.log('Skiped');
