@@ -8,7 +8,6 @@ if (!fs.existsSync(process.env.DATA_DIR)) {
     fs.mkdirSync(process.env.DATA_DIR)
 }
 const OpenSID = require('./opensid')
-const Pcare = require('./pcare')
 const PCare = require('./pcare')
 const { decodeResponse } = require('./pcare/lib')
 

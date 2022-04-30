@@ -6,7 +6,9 @@
   "type": "commonjs",
   "scripts": {
     "dev": "NODE_OPTIONS=--tls-cipher-list='ECDHE-RSA-AES128-GCM-SHA256' nodemon -e .js",
-    "start": "NODE_OPTIONS=--tls-cipher-list='ECDHE-RSA-AES128-GCM-SHA256' node index.js"
+    "dev-login": "NODE_OPTIONS=--tls-cipher-list='ECDHE-RSA-AES128-GCM-SHA256' nodemon -e .js -x node login-test.js",
+    "start": "NODE_OPTIONS=--tls-cipher-list='ECDHE-RSA-AES128-GCM-SHA256' node index.js",
+    "csv": "NODE_OPTIONS=--tls-cipher-list='ECDHE-RSA-AES128-GCM-SHA256' node index-csv.js"
   },
   "author": "Mochamad Arifin",
   "license": "ISC",
@@ -14,6 +16,7 @@
     "axios": "^0.26.1",
     "axios-cookiejar-support": "^2.0.4",
     "crypto-js": "^4.1.1",
+    "csv-stringify": "^6.0.5",
     "dotenv": "^16.0.0",
     "lz-string": "^1.4.4",
     "mysql2": "^2.3.3",

@@ -11,6 +11,7 @@ const qs = require('qs');
 const { randomBytes } = require('crypto');
 const { encodeRequest, decodeResponse } = require('./lib');
 const { data } = require('../opensid');
+const { botdetectResolve } = require('./botdetect');
 const CookieFileStore = require('tough-cookie-file-store').FileCookieStore
 process.env.NODE_OPTIONS = "--tls-cipher-list='ECDHE - RSA - AES128 - GCM - SHA256: !RC4'"
 const jar = new CookieJar(new CookieFileStore(process.env.DATA_DIR + '/cookie.json'));
@@ -24,7 +25,9 @@ const client = wrapper(axios.create({
     baseURL: "https://pcare.bpjs-kesehatan.go.id/vaksin",
     headers: {
         'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36',
-        'X-Forwarded-For': '234.23.112.12'
+        //'X-Forwarded-For': '234.23.112.12',
+        'Accept-Language': 'id',
+        Referer: 'https://pcare.bpjs-kesehatan.go.id/vaksin/Login',
     }
 
 }));
@@ -38,44 +41,61 @@ const Pcare = {
                     ...data.match(/<input name="__RequestVerificationToken" type="hidden" value="(?<token>[^\"]+)?"/).groups,
                 })
             ).then(
-                ({ src, token }) => client.get(src.replace('&amp;', '&'), { responseType: 'stream' }).then(
-                    ({ data }) => new Promise(async (r, j) => {
-                        let instanceId = src.match(/;t=(.+)$/)[1]
-                        const remoteCaptcha = await client.get(`/BotDetectCaptcha.ashx?get=script-include&c=AppCaptcha&t=${instanceId}`).then(
-                            ({ data }) => data.match(/\/\/remote\.captcha\.com\/include\.js\?i=[^\']+/)[0]
-                        );
-                        console.log('remote', remoteCaptcha);
-                        await axios.get('https:' + remoteCaptcha, {
-                            jar
-                        }).then(({ data }) => console.log(data))
-                        console.log(src, token);
-                        const tmp = join(tmpdir(), randomBytes(8).toString('hex') + '.jpg')
-                        const handle = createWriteStream(tmp)
-                        const readline = require('readline').createInterface({
-                            input: process.stdin,
-                            output: process.stdout
-                        });
-                        data.once('end', () => {
-                            console.log('File written', tmp);
-                            let captcha = ''
-                            const pid = cp.spawn('xdg-open', [tmp], {
-                                detached: true,
-                                stdio: 'pipe'
-                            })
-                            pid.once('error', j)
-                            readline.question('Captcha: ', val => {
-                                captcha = val
-                                pid.kill()
-                                readline.close();
-                                r({ captcha, token, instanceId })
-                                unlinkSync(tmp)
-                            });
-                        })
-                        data.once('error', j)
-                        data.pipe(handle)
+                async ({ src, token }) => {
+                    let instanceId = src.match(/;t=(.+)$/)[1]
+                    const remoteCaptcha = await client.get(`/BotDetectCaptcha.ashx?get=script-include&c=AppCaptcha&t=${instanceId}`).then(
+                        ({ data }) => data.match(/\/\/remote\.captcha\.com\/include\.js\?i=[^\']+/)[0]
+                    );
+                    console.log('remote', remoteCaptcha);
+                    await axios.get('https:' + remoteCaptcha, {
+                        jar
+                    })//.then(({ data }) => console.log(data))
+                    const spHs = await client.get(`/BotDetectCaptcha.ashx?get=p&c=AppCaptcha&t=${instanceId}`).then(
+                        ({ data }) => data
+                    );
+                    console.log('SPHS', spHs);
 
-                    })
-                )
+
+                    console.log('IMG', src.replaceAll('&amp;', '&'));
+                    return client.get('BotDetectCaptcha.ashx', {
+                        params: {
+                            get: 'image',
+                            c: 'AppCaptcha',
+                            t: instanceId
+                        },
+                        responseType: 'stream'
+                    }).then(
+                        ({ data }) => new Promise(async (r, j) => {
+
+                            const tmp = join(tmpdir(), randomBytes(8).toString('hex') + '.jpg')
+                            const handle = createWriteStream(tmp)
+                            const readline = require('readline').createInterface({
+                                input: process.stdin,
+                                output: process.stdout
+                            });
+                            data.once('end', () => {
+                                console.log('File written', tmp);
+                                let captcha = ''
+                                const pid = cp.spawn('xdg-open', [tmp], {
+                                    detached: true,
+                                    stdio: 'pipe'
+                                })
+                                pid.once('error', j)
+                                readline.question('Captcha: ', val => {
+                                    captcha = botdetectResolve(spHs.sp, val)
+                                    console.log('cp', val, '-->', captcha);
+                                    pid.kill()
+                                    readline.close();
+                                    r({ captcha, token, instanceId })
+                                    unlinkSync(tmp)
+                                });
+                            })
+                            data.once('error', j)
+                            data.pipe(handle)
+
+                        })
+                    )
+                }
             ).catch(e => {
                 console.error(e.message || e)
             })
@@ -111,10 +131,11 @@ const Pcare = {
                 captchaid: 'AppCaptcha',
                 instanceid: captcha.instanceId
             }
-            console.log('Resolved', qs.stringify(params));
+            console.log('Login POST:\n', qs.stringify(params));
             loggedIn = await client.post('Login/login', qs.stringify(params), {
                 headers: {
-                    'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                    'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
             }).then(
                 async ({ data, status }) => {
